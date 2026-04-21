@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeonArcade - Unblocked Games</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#a855f7;--secondary:#22d3ee;--accent:#34d399;--bg:#0a0a1a;--card:#14142b;--text:#e2e8f0;--glow:0 0 20px rgba(168,85,247,0.5)}
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600&display=swap');
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 50%,rgba(168,85,247,0.08),transparent 60%),radial-gradient(ellipse at 80% 50%,rgba(34,211,238,0.06),transparent 60%);pointer-events:none;z-index:0}
+
+/* NAV */
+.navbar{position:fixed;top:0;width:100%;padding:15px 30px;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,26,0.9);backdrop-filter:blur(15px);border-bottom:1px solid rgba(168,85,247,0.2);z-index:1000}
+.logo{font-family:'Orbitron',sans-serif;font-size:1.8em;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:var(--glow)}
+.logo span{color:var(--accent);-webkit-text-fill-color:var(--accent)}
+.nav-links{display:flex;gap:25px;align-items:center}
+.nav-links a{color:var(--text);text-decoration:none;font-size:0.95em;transition:color 0.3s;cursor:pointer}
+.nav-links a:hover{color:var(--primary)}
+.nav-links a.active{color:var(--primary);font-weight:600}
+.search-box{background:rgba(255,255,255,0.05);border:1px solid rgba(168,85,247,0.3);border-radius:25px;padding:8px 18px;color:var(--text);outline:none;font-size:0.9em;width:200px;transition:border-color 0.3s}
+.search-box:focus{border-color:var(--primary)}
+
+/* HERO */
+.hero{margin-top:70px;padding:60px 30px;text-align:center;position:relative}
+.hero h1{font-family:'Orbitron',sans-serif;font-size:3em;margin-bottom:15px;background:linear-gradient(135deg,var(--primary),var(--secondary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:1.2em;color:rgba(226,232,240,0.7);max-width:600px;margin:0 auto}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-top:30px}
+.hero-stats .stat{text-align:center}
+.hero-stats .stat-num{font-family:'Orbitron',sans-serif;font-size:2em;color:var(--primary)}
+.hero-stats .stat-label{font-size:0.85em;color:rgba(226,232,240,0.5);margin-top:5px}
+
+/* CATEGORY TABS */
+.categories{display:flex;justify-content:center;gap:12px;padding:10px 30px 30px;flex-wrap:wrap}
+.cat-btn{padding:8px 22px;border-radius:20px;border:1px solid rgba(168,85,247,0.3);background:rgba(168,85,247,0.08);color:var(--text);cursor:pointer;font-size:0.9em;transition:all 0.3s}
+.cat-btn:hover,.cat-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 0 15px rgba(168,85,247,0.4)}
+
+/* GAME GRID */
+.games-section{padding:0 30px 60px;position:relative;z-index:1}
+.games-section h2{font-family:'Orbitron',sans-serif;font-size:1.5em;margin-bottom:25px;color:var(--text)}
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:22px;max-width:1400px;margin:0 auto}
+.game-card{background:var(--card);border-radius:16px;overflow:hidden;border:1px solid rgba(168,85,247,0.15);transition:all 0.3s;cursor:pointer;position:relative}
+.game-card:hover{transform:translateY(-5px);border-color:var(--primary);box-shadow:0 10px 40px rgba(168,85,247,0.2)}
+.game-thumb{height:160px;display:flex;align-items:center;justify-content:center;font-size:4em;position:relative;overflow:hidden}
+.game-thumb::before{content:'';position:absolute;inset:0;opacity:0.15}
+.game-info{padding:16px}
+.game-info h3{font-family:'Orbitron',sans-serif;font-size:1em;margin-bottom:6px}
+.game-info p{font-size:0.8em;color:rgba(226,232,240,0.5);line-height:1.4}
+.game-tag{display:inline-block;padding:3px 10px;border-radius:10px;font-size:0.7em;margin-top:8px;background:rgba(168,85,247,0.15);color:var(--primary)}
+.game-tag.arcade{background:rgba(34,211,238,0.15);color:var(--secondary)}
+.game-tag.puzzle{background:rgba(52,211,153,0.15);color:var(--accent)}
+.play-badge{position:absolute;top:12px;right:12px;background:var(--primary);color:#fff;padding:4px 12px;border-radius:12px;font-size:0.75em;font-weight:600}
+
+/* GAME SCREEN */
+.game-screen{display:none;position:fixed;inset:0;background:rgba(10,10,26,0.97);z-index:2000;flex-direction:column;align-items:center;justify-content:center}
+.game-screen.active{display:flex}
+.game-header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:820px;padding:15px 20px}
+.game-header h2{font-family:'Orbitron',sans-serif;font-size:1.3em;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.btn-back{background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);color:var(--text);padding:8px 20px;border-radius:10px;cursor:pointer;font-size:0.9em;transition:all 0.3s}
+.btn-back:hover{background:var(--primary);color:#fff}
+.game-container{background:#000;border-radius:16px;border:2px solid rgba(168,85,247,0.3);overflow:hidden;position:relative}
+.game-container canvas{display:block}
+.game-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);z-index:10}
+.game-overlay h3{font-family:'Orbitron',sans-serif;font-size:2em;margin-bottom:10px;color:var(--primary)}
+.game-overlay p{color:rgba(226,232,240,0.7);margin-bottom:20px;font-size:1em}
+.btn-play{background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff;border:none;padding:14px 40px;border-radius:12px;font-size:1.1em;font-family:'Orbitron',sans-serif;cursor:pointer;transition:all 0.3s;box-shadow:0 0 25px rgba(168,85,247,0.4)}
+.btn-play:hover{transform:scale(1.05);box-shadow:0 0 35px rgba(168,85,247,0.6)}
+.score-display{font-family:'Orbitron',sans-serif;color:var(--secondary);font-size:1.2em;position:absolute;top:15px;left:20px;z-index:5}
+.high-score-display{font-family:'Orbitron',sans-serif;color:var(--accent);font-size:0.85em;position:absolute;top:15px;right:20px;z-index:5}
+
+/* FOOTER */
+.footer{text-align:center;padding:40px;border-top:1px solid rgba(168,85,247,0.1);color:rgba(226,232,240,0.3);font-size:0.85em}
+.footer a{color:var(--primary);text-decoration:none}
+
+/* FULLSCREEN BUTTON */
+.btn-fullscreen{background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);color:var(--text);padding:8px 16px;border-radius:10px;cursor:pointer;font-size:0.85em;transition:all 0.3s;margin-left:10px}
+.btn-fullscreen:hover{background:var(--primary);color:#fff}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+.hero h1{font-size:2em}
+.game-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.navbar{padding:12px 15px}
+.logo{font-size:1.3em}
+.nav-links{gap:12px}
+.search-box{width:140px}
+.game-container canvas{max-width:95vw}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo">NEON<span>ARCADE</span></div>
+  <div class="nav-links">
+    <a class="active" onclick="showHome()">Home</a>
+    <a onclick="filterGames('all')">All Games</a>
+    <a onclick="filterGames('popular')">Popular</a>
+    <input type="text" class="search-box" placeholder="Search games..." oninput="searchGames(this.value)">
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <h1>⚡ NEON ARCADE ⚡</h1>
+  <p>Original browser games — no downloads, no installs. Just hit play.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">8</div><div class="stat-label">Games</div></div>
+    <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Fun</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">Downloads</div></div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<div class="categories">
+  <button class="cat-btn active" onclick="filterGames('all')">🎮 All</button>
+  <button class="cat-btn" onclick="filterGames('arcade')">🕹️ Arcade</button>
+  <button class="cat-btn" onclick="filterGames('puzzle')">🧩 Puzzle</button>
+  <button class="cat-btn" onclick="filterGames('action')">⚔️ Action</button>
+  <button class="cat-btn" onclick="filterGames('reflex')">⚡ Reflex</button>
+</div>
+
+<!-- GAME GRID -->
+<section class="games-section">
+  <div class="game-grid" id="gameGrid"></div>
+</section>
+
+<!-- GAME SCREEN -->
+<div class="game-screen" id="gameScreen">
+  <div class="game-header">
+    <h2 id="gameTitle">Game</h2>
+    <div>
+      <button class="btn-back" onclick="closeGame()">← Back</button>
+      <button class="btn-fullscreen" onclick="goFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </div>
+  <div class="game-container" id="gameContainer">
+    <div class="score-display" id="scoreDisplay">Score: 0</div>
+    <div class="high-score-display" id="highScoreDisplay">Best: 0</div>
+    <canvas id="gameCanvas" width="780" height="520"></canvas>
+    <div class="game-overlay" id="gameOverlay">
+      <h3 id="overlayTitle">Ready?</h3>
+      <p id="overlayText">Press Play to start</p>
+      <button class="btn-play" id="overlayBtn" onclick="startCurrentGame()">▶ PLAY</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>NeonArcade &copy; 2026 — Built with 💜 by ProducerCJ</p>
+</div>
+
+<script>
+// ========================== GAME REGISTRY ==========================
+const GAMES = [
+  {id:'neon-snake', name:'Neon Snake', icon:'🐍', desc:'Eat, grow, survive. Classic snake with neon trails.', cat:'arcade', tags:['arcade','popular'], color:'#7c3aed'},
+  {id:'astro-dodge', name:'Astro Dodge', icon:'🚀', desc:'Dodge meteors in deep space. How long can you survive?', cat:'action', tags:['action','popular'], color:'#0ea5e9'},
+  {id:'memory-matrix', name:'Memory Matrix', icon:'🧠', desc:'Match neon tiles before time runs out.', cat:'puzzle', tags:['puzzle'], color:'#10b981'},
+  {id:'click-rush', name:'Click Rush', icon:'🎯', desc:'Test your reaction speed. Click the targets!', cat:'reflex', tags:['reflex','popular'], color:'#f43f5e'},
+  {id:'brick-blaster', name:'Brick Blaster', icon:'🧱', desc:'Smash bricks with a bouncing ball. Clear every level!', cat:'arcade', tags:['arcade'], color:'#f59e0b'},
+  {id:'color-surge', name:'Color Surge', icon:'🎨', desc:'Match the color before time expires. Speed matters!', cat:'reflex', tags:['reflex','puzzle'], color:'#ec4899'},
+  {id:'gravity-jump', name:'Gravity Jump', icon:'🌌', desc:'Jump between platforms in zero gravity.', cat:'action', tags:['action'], color:'#6366f1'},
+  {id:'number-crunch', name:'Number Crunch', icon:'🔢', desc:'Merge numbers on a grid. Reach the highest score!', cat:'puzzle', tags:['puzzle','popular'], color:'#14b8a6'}
+];
+
+let currentGame = null;
+let gameLoop = null;
+let score = 0;
+let highScores = {};
+
+// Load high scores
+try { highScores = JSON.parse(localStorage.getItem('neonArcadeScores') || '{}'); } catch(e){}
+
+function saveHighScore(id, s) {
+  if (!highScores[id] || s > highScores[id]) { highScores[id] = s; localStorage.setItem('neonArcadeScores', JSON.stringify(highScores)); }
+}
+
+// ========================== UI ==========================
+function renderGames(list) {
+  const grid = document.getElementById('gameGrid');
+  grid.innerHTML = list.map(g => `
+    <div class="game-card" onclick="openGame('${g.id}')" data-cat="${g.cat}" data-tags="${g.tags.join(',')}">
+      <div class="game-thumb" style="background:linear-gradient(135deg,${g.color}22,${g.color}44)">${g.icon}
+        <span class="play-badge">PLAY</span>
+      </div>
+      <div class="game-info">
+        <h3>${g.name}</h3>
+        <p>${g.desc}</p>
+        <span class="game-tag ${g.cat}">${g.cat}</span>
+        ${highScores[g.id] ? `<span class="game-tag" style="margin-left:5px">Best: ${highScores[g.id]}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterGames(cat) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  event && event.target && event.target.classList.add('active');
+  if (cat === 'all') renderGames(GAMES);
+  else if (cat === 'popular') renderGames(GAMES.filter(g => g.tags.includes('popular')));
+  else renderGames(GAMES.filter(g => g.cat === cat));
+}
+
+function searchGames(q) {
+  q = q.toLowerCase();
+  renderGames(GAMES.filter(g => g.name.toLowerCase().includes(q) || g.desc.toLowerCase().includes(q) || g.cat.includes(q)));
+}
+
+function showHome() { filterGames('all'); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function openGame(id) {
+  currentGame = id;
+  const g = GAMES.find(x => x.id === id);
+  document.getElementById('gameTitle').textContent = g.name;
+  document.getElementById('gameScreen').classList.add('active');
+  document.getElementById('gameOverlay').style.display = 'flex';
+  document.getElementById('overlayTitle').textContent = g.name;
+  document.getElementById('overlayText').textContent = getGameInstructions(id);
+  document.getElementById('overlayBtn').textContent = '▶ PLAY';
+  document.getElementById('scoreDisplay').textContent = 'Score: 0';
+  document.getElementById('highScoreDisplay').textContent = 'Best: ' + (highScores[id] || 0);
+  score = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGame() {
+  if (gameLoop) { cancelAnimationFrame(gameLoop); gameLoop = null; }
+  document.getElementById('gameScreen').classList.remove('active');
+  document.body.style.overflow = '';
+  currentGame = null;
+  renderGames(GAMES);
+}
+
+function goFullscreen() {
+  const el = document.getElementById('gameContainer');
+  if (el.requestFullscreen) el.requestFullscreen();
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+}
+
+function showGameOver(finalScore) {
+  saveHighScore(currentGame, finalScore);
+  document.getElementById('highScoreDisplay').textContent = 'Best: ' + (highScores[currentGame] || 0);
+  const ov = document.getElementById('gameOverlay');
+  ov.style.display = 'flex';
+  document.getElementById('overlayTitle').textContent = 'Game Over!';
+  document.getElementById('overlayText').textContent = `Score: ${finalScore}`;
+  document.getElementById('overlayBtn').textContent = '🔄 RETRY';
+}
+
+function getGameInstructions(id) {
+  const m = {
+    'neon-snake': 'Arrow keys or WASD to move. Eat food to grow!',
+    'astro-dodge': 'Arrow keys or A/D to dodge. Survive as long as you can!',
+    'memory-matrix': 'Click tiles to reveal and match pairs.',
+    'click-rush': 'Click the targets as fast as you can!',
+    'brick-blaster': 'Mouse to move paddle. Break all the bricks!',
+    'color-surge': 'Click the color that matches the word!',
+    'gravity-jump': 'Left/Right arrows to move. Space to jump!',
+    'number-crunch': 'Arrow keys to slide. Merge same numbers!'
+  };
+  return m[id] || 'Press Play to start';
+}
+
+function startCurrentGame() {
+  document.getElementById('gameOverlay').style.display = 'none';
+  score = 0;
+  document.getElementById('scoreDisplay').textContent = 'Score: 0';
+  if (gameLoop) cancelAnimationFrame(gameLoop);
+  switch(currentGame) {
+    case 'neon-snake': initSnake(); break;
+    case 'astro-dodge': initAstroDodge(); break;
+    case 'memory-matrix': initMemoryMatrix(); break;
+    case 'click-rush': initClickRush(); break;
+    case 'brick-blaster': initBrickBlaster(); break;
+    case 'color-surge': initColorSurge(); break;
+    case 'gravity-jump': initGravityJump(); break;
+    case 'number-crunch': initNumberCrunch(); break;
+  }
+}
+
+function updateScore(s) {
+  score = s;
+  document.getElementById('scoreDisplay').textContent = 'Score: ' + s;
+}
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const W = 780, H = 520;
+
+// ========================== GAME 1: NEON SNAKE ==========================
+function initSnake() {
+  const grid = 20, cols = W/grid, rows = H/grid;
+  let snake = [{x:10,y:10}], dir = {x:1,y:0}, food = null, trail = [], alive = true;
+  function placeFood() { food = {x:Math.floor(Math.random()*cols), y:Math.floor(Math.random()*rows)}; }
+  placeFood();
+  const keyH = e => {
+    if (['ArrowUp','w','W'].includes(e.key) && dir.y===0) dir={x:0,y:-1};
+    else if (['ArrowDown','s','S'].includes(e.key) && dir.y===0) dir={x:0,y:1};
+    else if (['ArrowLeft','a','A'].includes(e.key) && dir.x===0) dir={x:-1,y:0};
+    else if (['ArrowRight','d','D'].includes(e.key) && dir.x===0) dir={x:1,y:0};
+    e.preventDefault();
+  };
+  document.addEventListener('keydown', keyH);
+  let lastMove = 0;
+  function loop(t) {
+    if (!alive) { document.removeEventListener('keydown', keyH); showGameOver(score); return; }
+    gameLoop = requestAnimationFrame(loop);
+    if (t - lastMove < 90) return;
+    lastMove = t;
+    const head = {x:snake[0].x+dir.x, y:snake[0].y+dir.y};
+    if (head.x<0||head.x>=cols||head.y<0||head.y>=rows) { alive=false; return; }
+    for (let s of snake) if (s.x===head.x&&s.y===head.y) { alive=false; return; }
+    snake.unshift(head);
+    if (head.x===food.x&&head.y===food.y) { updateScore(score+10); trail.push({...food,a:1}); placeFood(); }
+    else snake.pop();
+    // draw
+    ctx.fillStyle='#0a0a1a'; ctx.fillRect(0,0,W,H);
+    // grid lines
+    ctx.strokeStyle='rgba(168,85,247,0.05)';
+    for(let i=0;i<cols;i++){ctx.beginPath();ctx.moveTo(i*grid,0);ctx.lineTo(i*grid,H);ctx.stroke();}
+    for(let i=0;i<rows;i++){ctx.beginPath();ctx.moveTo(0,i*grid);ctx.lineTo(W,i*grid);ctx.stroke();}
+    // trail
+    trail = trail.filter(t => { t.a -= 0.02; return t.a > 0; });
+    trail.forEach(t => { ctx.fillStyle=`rgba(168,85,247,${t.a*0.3})`; ctx.fillRect(t.x*grid,t.y*grid,grid,grid); });
+    // food
+    ctx.fillStyle='#22d3ee'; ctx.shadowColor='#22d3ee'; ctx.shadowBlur=15;
+    ctx.beginPath(); ctx.arc(food.x*grid+grid/2, food.y*grid+grid/2, grid/2-2, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    // snake
+    snake.forEach((s,i) => {
+      const alpha = 1 - i/(snake.length+5);
+      ctx.fillStyle = i===0 ? '#a855f7' : `rgba(168,85,247,${alpha})`;
+      ctx.shadowColor='#a855f7'; ctx.shadowBlur=i===0?15:5;
+      ctx.beginPath(); ctx.roundRect(s.x*grid+1, s.y*grid+1, grid-2, grid-2, 4); ctx.fill();
+    });
+    ctx.shadowBlur=0;
+  }
+  gameLoop = requestAnimationFrame(loop);
+}
+
+// ========================== GAME 2: ASTRO DODGE ==========================
+function initAstroDodge() {
+  let ship = {x:W/2,y:H-60,w:30,h:20}, meteors=[], stars=[], alive=true, frame=0, speed=2;
+  for(let i=0;i<80;i++) stars.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*2+0.5,b:Math.random()});
+  const keys = {};
+  const kd = e => { keys[e.key]=true; e.preventDefault(); };
+  const ku = e => { keys[e.key]=false; };
+  document.addEventListener('keydown',kd);
+  document.addEventListener('keyup',ku);
+  function loop() {
+    if(!alive){document.removeEventListener('keydown',kd);document.removeEventListener('keyup',ku);showGameOver(score);return;}
+    gameLoop=requestAnimationFrame(loop);
+    frame++;
+    if(frame%2===0) updateScore(score+1);
+    if(frame%500===0) speed+=0.5;
+    // move ship
+    if((keys['ArrowLeft']||keys['a']||keys['A'])&&ship.x>0) ship.x-=5;
+    if((keys['ArrowRight']||keys['d']||keys['D'])&&ship.x<W-ship.w) ship.x+=5;
+    if((keys['ArrowUp']||keys['w']||keys['W'])&&ship.y>0) ship.y-=4;
+    if((keys['ArrowDown']||keys['s']||keys['S'])&&ship.y<H-ship.h) ship.y+=4;
+    // spawn meteors
+    if(frame%18===0) meteors.push({x:Math.random()*(W-20),y:-20,w:15+Math.random()*25,h:15+Math.random()*25,s:speed+Math.random()*2,r:Math.random()*360});
+    // move meteors
+    meteors.forEach(m=>{m.y+=m.s;m.r+=2;});
+    meteors=meteors.filter(m=>m.y<H+30);
+    // collision
+    for(let m of meteors){if(ship.x<m.x+m.w&&ship.x+ship.w>m.x&&ship.y<m.y+m.h&&ship.y+ship.h>m.y){alive=false;break;}}
+    // draw
+    ctx.fillStyle='#050510';ctx.fillRect(0,0,W,H);
+    stars.forEach(s=>{s.y+=s.s*0.5;if(s.y>H)s.y=0;s.b+=0.02;ctx.fillStyle=`rgba(255,255,255,${0.3+Math.sin(s.b)*0.3})`;ctx.fillRect(s.x,s.y,1.5,1.5);});
+    // ship
+    ctx.save();ctx.translate(ship.x+ship.w/2,ship.y+ship.h/2);
+    ctx.fillStyle='#a855f7';ctx.shadowColor='#a855f7';ctx.shadowBlur=20;
+    ctx.beginPath();ctx.moveTo(0,-ship.h/2);ctx.lineTo(-ship.w/2,ship.h/2);ctx.lineTo(ship.w/2,ship.h/2);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#22d3ee';ctx.shadowColor='#22d3ee';
+    ctx.beginPath();ctx.moveTo(-5,ship.h/2);ctx.lineTo(0,ship.h/2+8+Math.random()*5);ctx.lineTo(5,ship.h/2);ctx.fill();
+    ctx.restore();ctx.shadowBlur=0;
+    // meteors
+    meteors.forEach(m=>{ctx.save();ctx.translate(m.x+m.w/2,m.y+m.h/2);ctx.rotate(m.r*Math.PI/180);ctx.fillStyle='#f43f5e';ctx.shadowColor='#f43f5e';ctx.shadowBlur=10;ctx.fillRect(-m.w/2,-m.h/2,m.w,m.h);ctx.restore();});
+    ctx.shadowBlur=0;
+  }
+  gameLoop=requestAnimationFrame(loop);
+}
+
+// ========================== GAME 3: MEMORY MATRIX ==========================
+function initMemoryMatrix() {
+  const cols=6,rows=4,pad=12,cardW=(W-pad*(cols+1))/cols,cardH=(H-pad*(rows+1))/rows;
+  const emojis=['🎵','🎸','🎹','🎤','🎧','🎺','🎻','🥁','🎷','🎶','🔊','🎙️'];
+  let cards=[],flipped=[],matched=[],moves=0,canClick=true;
+  const total=cols*rows;
+  const symbols=emojis.slice(0,total/2);
+  let deck=[...symbols,...symbols];
+  deck.sort(()=>Math.random()-0.5);
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) cards.push({x:pad+c*(cardW+pad),y:pad+r*(cardH+pad),w:cardW,h:cardH,sym:deck[r*cols+c],flip:false,match:false});
+  function draw(){
+    ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
+    cards.forEach((c,i)=>{
+      if(c.match){ctx.fillStyle='rgba(34,211,153,0.15)';ctx.strokeStyle='#34d399';}
+      else if(c.flip){ctx.fillStyle='rgba(168,85,247,0.2)';ctx.strokeStyle='#a855f7';}
+      else{ctx.fillStyle='#14142b';ctx.strokeStyle='rgba(168,85,247,0.3)';}
+      ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(c.x,c.y,c.w,c.h,10);ctx.fill();ctx.stroke();
+      if(c.flip||c.match){ctx.font='2.2em sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c.sym,c.x+c.w/2,c.y+c.h/2);}
+      else{ctx.fillStyle='rgba(168,85,247,0.3)';ctx.font='1.5em sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',c.x+c.w/2,c.y+c.h/2);}
+    });
+  }
+  draw();
+  const clickH = e => {
+    if(!canClick)return;
+    const rect=canvas.getBoundingClientRect();
+    const mx=(e.clientX-rect.left)*(W/rect.width), my=(e.clientY-rect.top)*(H/rect.height);
+    const ci=cards.findIndex(c=>mx>=c.x&&mx<=c.x+c.w&&my>=c.y&&my<=c.y+c.h&&!c.flip&&!c.match);
+    if(ci===-1)return;
+    cards[ci].flip=true;flipped.push(ci);draw();
+    if(flipped.length===2){
+      canClick=false;moves++;
+      const [a,b]=flipped;
+      if(cards[a].sym===cards[b].sym){
+        cards[a].match=cards[b].match=true;matched.push(a,b);
+        updateScore(score+25);flipped=[];canClick=true;draw();
+        if(matched.length===cards.length){canvas.removeEventListener('click',clickH);setTimeout(()=>showGameOver(score),500);}
+      }else{
+        setTimeout(()=>{cards[a].flip=cards[b].flip=false;flipped=[];canClick=true;draw();},700);
+      }
+    }
+  };
+  canvas.addEventListener('click',clickH);
+  // cleanup on close
+  const origClose=closeGame;
+  closeGame=()=>{canvas.removeEventListener('click',clickH);closeGame=origClose;origClose();};
+}
+
+// ========================== GAME 4: CLICK RUSH ==========================
+function initClickRush() {
+  let targets=[],timeLeft=30,hits=0,lastSpawn=0,interval=null;
+  function spawnTarget(){targets.push({x:40+Math.random()*(W-80),y:40+Math.random()*(H-80),r:15+Math.random()*20,life:2,born:Date.now(),color:`hsl(${Math.random()*360},80%,60%)`});}
+  spawnTarget();spawnTarget();
+  interval=setInterval(()=>{timeLeft--;if(timeLeft<=0){clearInterval(interval);canvas.removeEventListener('click',clickH);showGameOver(score);}},1000);
+  function draw(){
+    ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
+    // timer bar
+    ctx.fillStyle='rgba(168,85,247,0.2)';ctx.fillRect(0,0,W,6);
+    ctx.fillStyle='#a855f7';ctx.fillRect(0,0,W*(timeLeft/30),6);
+    // targets
+    targets.forEach(t=>{
+      const age=(Date.now()-t.born)/1000;
+      const scale=1-age/t.life;if(scale<=0)return;
+      ctx.globalAlpha=Math.max(0,scale);
+      ctx.fillStyle=t.color;ctx.shadowColor=t.color;ctx.shadowBlur=20;
+      ctx.beginPath();ctx.arc(t.x,t.y,t.r*scale,0,Math.PI*2);ctx.fill();
+      // inner ring
+      ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(t.x,t.y,t.r*scale*0.4,0,Math.PI*2);ctx.stroke();
+      ctx.globalAlpha=1;ctx.shadowBlur=0;
+    });
+    ctx.font='bold 1em Orbitron,sans-serif';ctx.fillStyle='var(--text)';ctx.textAlign='right';
+    ctx.fillStyle='#e2e8f0';ctx.fillText(`Time: ${timeLeft}s`,W-20,35);
+  }
+  function update(){
+    targets=targets.filter(t=>(Date.now()-t.born)/1000<t.life);
+    if(Math.random()<0.06)spawnTarget();
+    draw();
+    if(timeLeft>0) gameLoop=requestAnimationFrame(update);
+  }
+  const clickH=e=>{
+    const rect=canvas.getBoundingClientRect();
+    const mx=(e.clientX-rect.left)*(W/rect.width),my=(e.clientY-rect.top)*(H/rect.height);
+    for(let i=targets.length-1;i>=0;i--){
+      const t=targets[i],age=(Date.now()-t.born)/1000,scale=1-age/t.life;
+      const dx=mx-t.x,dy=my-t.y;
+      if(dx*dx+dy*dy<(t.r*scale)**2){targets.splice(i,1);hits++;updateScore(score+50);break;}
+    }
+  };
+  canvas.addEventListener('click',clickH);
+  gameLoop=requestAnimationFrame(update);
+  const origClose=closeGame;
+  closeGame=()=>{clearInterval(interval);canvas.removeEventListener('click',clickH);closeGame=origClose;origClose();};
+}
+
+// ========================== GAME 5: BRICK BLASTER ==========================
+function initBrickBlaster() {
+  const pw=100,ph=14,brickRows=5,brickCols=10,brickW=W/brickCols-4,brickH=22;
+  let paddle={x:W/2-pw/2,y:H-35,w:pw,h:ph};
+  let ball={x:W/2,y:H-55,r:8,dx:4,dy:-4};
+  let bricks=[],alive=true;
+  const colors=['#a855f7','#22d3ee','#34d399','#f43f5e','#f59e0b'];
+  for(let r=0;r<brickRows;r++) for(let c=0;c<brickCols;c++) bricks.push({x:c*(brickW+4)+2,y:r*(brickH+4)+40,w:brickW,h:brickH,alive:true,color:colors[r]});
+  const moveH=e=>{const rect=canvas.getBoundingClientRect();paddle.x=(e.clientX-rect.left)*(W/rect.width)-paddle.w/2;paddle.x=Math.max(0,Math.min(W-paddle.w,paddle.x));};
+  canvas.addEventListener('mousemove',moveH);
+  function loop(){
+    if(!alive){canvas.removeEventListener('mousemove',moveH);showGameOver(score);return;}
+    gameLoop=requestAnimationFrame(loop);
+    ball.x+=ball.dx;ball.y+=ball.dy;
+    if(ball.x<=ball.r||ball.x>=W-ball.r)ball.dx*=-1;
+    if(ball.y<=ball.r)ball.dy*=-1;
+    if(ball.y>=H){alive=false;return;}
+    // paddle collision
+    if(ball.y+ball.r>=paddle.y&&ball.x>=paddle.x&&ball.x<=paddle.x+paddle.w&&ball.dy>0){
+      ball.dy*=-1;
+      ball.dx+=((ball.x-(paddle.x+paddle.w/2))/(paddle.w/2))*2;
+    }
+    // brick collision
+    bricks.forEach(b=>{if(!b.alive)return;if(ball.x+ball.r>b.x&&ball.x-ball.r<b.x+b.w&&ball.y+ball.r>b.y&&ball.y-ball.r<b.y+b.h){b.alive=false;ball.dy*=-1;updateScore(score+15);}});
+    if(bricks.every(b=>!b.alive)){alive=false;return;}
+    // draw
+    ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
+    bricks.forEach(b=>{if(!b.alive)return;ctx.fillStyle=b.color;ctx.shadowColor=b.color;ctx.shadowBlur=8;ctx.beginPath();ctx.roundRect(b.x,b.y,b.w,b.h,4);ctx.fill();});
+    ctx.shadowBlur=0;
+    // paddle
+    ctx.fillStyle='#a855f7';ctx.shadowColor='#a855f7';ctx.shadowBlur=12;ctx.beginPath();ctx.roundRect(paddle.x,paddle.y,paddle.w,paddle.h,7);ctx.fill();ctx.shadowBlur=0;
+    // ball
+    ctx.fillStyle='#22d3ee';ctx.shadowColor='#22d3ee';ctx.shadowBlur=15;ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+  }
+  gameLoop=requestAnimationFrame(loop);
+  const origClose=closeGame;
+  closeGame=()=>{canvas.removeEventListener('mousemove',moveH);closeGame=origClose;origClose();};
+}
+
+// ========================== GAME 6: COLOR SURGE ==========================
+function initColorSurge() {
+  const colorNames=['RED','BLUE','GREEN','YELLOW','PURPLE','CYAN','ORANGE','PINK'];
+  const colorVals=['#ef4444','#3b82f6','#22c55e','#eab308','#a855f7','#06b6d4','#f97316','#ec4899'];
+  let timeLeft=25,current=null,interval=null,canClick=true,combo=0,buttons=[];
+  function newRound(){
+    const wordIdx=Math.floor(Math.random()*colorNames.length);
+    let inkIdx;do{inkIdx=Math.floor(Math.random()*colorNames.length);}while(inkIdx===wordIdx&&Math.random()>0.3);
+    current={word:colorNames[wordIdx],ink:colorVals[inkIdx],answer:wordIdx};
+    // make 4 buttons with one correct
+    const opts=new Set([wordIdx]);
+    while(opts.size<4){opts.add(Math.floor(Math.random()*colorNames.length));}
+    buttons=[...opts].sort(()=>Math.random()-0.5);
+    draw();
+  }
+  interval=setInterval(()=>{timeLeft--;if(timeLeft<=0){clearInterval(interval);canvas.removeEventListener('click',clickH);showGameOver(score);}draw();},1000);
+  function draw(){
+    ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
+    // timer
+    ctx.fillStyle='rgba(168,85,247,0.2)';ctx.fillRect(0,0,W,6);
+    ctx.fillStyle=timeLeft>5?'#a855f7':'#f43f5e';ctx.fillRect(0,0,W*(timeLeft/25),6);
+    // combo
+    if(combo>1){ctx.font='bold 0.9em Orbitron,sans-serif';ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.fillText(`🔥 Combo x${combo}`,W/2,35);}
+    // instruction
+    ctx.font='1em Inter,sans-serif';ctx.fillStyle='rgba(226,232,240,0.5)';ctx.textAlign='center';ctx.fillText('Click the COLOR of the text (not the word!)',W/2,75);
+    // word
+    ctx.font='bold 4em Orbitron,sans-serif';ctx.fillStyle=current.ink;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(current.word,W/2,200);
+    // buttons
+    const bw=150,bh=55,gap=20,totalW=buttons.length*(bw+gap)-gap,startX=(W-totalW)/2;
+    buttons.forEach((bi,i)=>{
+      const bx=startX+i*(bw+gap),by=350;
+      ctx.fillStyle=colorVals[bi];ctx.shadowColor=colorVals[bi];ctx.shadowBlur=10;
+      ctx.beginPath();ctx.roundRect(bx,by,bw,bh,12);ctx.fill();
+      ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.font='bold 1em Inter,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(colorNames[bi],bx+bw/2,by+bh/2);
+    });
+  }
+  const clickH=e=>{
+    if(!canClick)return;
+    const rect=canvas.getBoundingClientRect();
+    const mx=(e.clientX-rect.left)*(W/rect.width),my=(e.clientY-rect.top)*(H/rect.height);
+    const bw=150,bh=55,gap=20,totalW=buttons.length*(bw+gap)-gap,startX=(W-totalW)/2;
+    buttons.forEach((bi,i)=>{
+      const bx=startX+i*(bw+gap),by=350;
+      if(mx>=bx&&mx<=bx+bw&&my>=by&&my<=by+bh){
+        if(bi===current.answer){combo++;updateScore(score+25*Math.min(combo,5));newRound();}
+        else{combo=0;timeLeft=Math.max(0,timeLeft-3);newRound();}
+      }
+    });
+  };
+  canvas.addEventListener('click',clickH);
+  newRound();
+  const origClose=closeGame;
+  closeGame=()=>{clearInterval(interval);canvas.removeEventListener('click',clickH);closeGame=origClose;origClose();};
+}
+
+// ========================== GAME 7: GRAVITY JUMP ==========================
+function initGravityJump() {
+  let player={x:W/2,y:H-60,w:24,h:24,vy:0,onGround:false};
+  let platforms=[],scrollY=0,maxHeight=0,alive=true,frame=0;
+  const gravity=0.35,jumpForce=-10;
+  // initial platforms
+  for(let i=0;i<8;i++) platforms.push({x:Math.random()*(W-80),y:H-80-i*70,w:70+Math.random()*40,type:Math.random()>0.8?'move':'static',dx:Math.random()>0.5?1:-1});
+  platforms.push({x:W/2-50,y:H-30,w:100,type:'static',dx:0});
+  const keys={};
+  const kd=e=>{keys[e.key]=true;e.preventDefault();};
+  const ku=e=>{keys[e.key]=false;};
+  document.addEventListener('keydown',kd);
+  document.addEventListener('keyup',ku);
+  function loop(){
+    if(!alive){document.removeEventListener('keydown',kd);document.removeEventListener('keyup',ku);showGameOver(score);return;}
+    gameLoop=requestAnimationFrame(loop);
+    frame++;
+    if(keys['ArrowLeft']||keys['a']||keys['A']) player.x-=5;
+    if(keys['ArrowRight']||keys['d']||keys['D']) player.x+=5;
+    if((keys[' ']||keys['ArrowUp']||keys['w']||keys['W'])&&player.onGround){player.vy=jumpForce;player.onGround=false;}
+    player.x=(player.x+W)%W; // wrap
+    player.vy+=gravity;
+    player.y+=player.vy;
+    player.onGround=false;
+    // platform collision
+    platforms.forEach(p=>{
+      if(p.type==='move'){p.x+=p.dx;if(p.x<=0||p.x+p.w>=W)p.dx*=-1;}
+      if(player.vy>=0&&player.y+player.h>=p.y&&player.y+player.h<=p.y+12&&player.x+player.w>p.x&&player.x<p.x+p.w){
+        player.y=p.y-player.h;player.vy=0;player.onGround=true;
+      }
+    });
+    // scroll
+    const heightFromBottom=H-player.y;
+    if(heightFromBottom>maxHeight){
+      const diff=heightFromBottom-maxHeight;
+      maxHeight=heightFromBottom;
+      updateScore(Math.floor(maxHeight/5));
+      platforms.forEach(p=>p.y+=diff);
+      player.y+=diff;
+      // add new platforms
+      while(platforms[0].y>-10||platforms.length<10){
+        platforms.unshift({x:Math.random()*(W-80),y:platforms[0].y-60-Math.random()*30,w:60+Math.random()*40,type:Math.random()>0.7?'move':'static',dx:Math.random()>0.5?1.5:-1.5});
+      }
+    }
+    // remove off screen
+    platforms=platforms.filter(p=>p.y<H+20);
+    // death
+    if(player.y>H+50) alive=false;
+    // draw
+    ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
+    // platforms
+    platforms.forEach(p=>{
+      ctx.fillStyle=p.type==='move'?'#f59e0b':'#6366f1';
+      ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=8;
+      ctx.beginPath();ctx.roundRect(p.x,p.y,p.w,8,4);ctx.fill();
+    });
+    ctx.shadowBlur=0;
+    // player
+    ctx.fillStyle='#a855f7';ctx.shadowColor='#a855f7';ctx.shadowBlur=15;
+    ctx.beginPath();ctx.roundRect(player.x,player.y,player.w,player.h,6);ctx.fill();
+    ctx.fillStyle='#22d3ee';ctx.beginPath();ctx.arc(player.x+8,player.y+8,3,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(player.x+16,player.y+8,3,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+  }
+  gameLoop=requestAnimationFrame(loop);
+}
+
+// ========================== GAME 8: NUMBER CRUNCH ==========================
+function initNumberCrunch() {
+  const size=4,pad=10;
+  const cellW=(W-pad*(size+1))/size, cellH=(H-pad*(size+1))/size;
+  let grid=Array(size).fill(null).map(()=>Array(size).fill(0));
+  let gameOver=false;
+  function addRandom(){
+    const empty=[];
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(grid[r][c]===0) empty.push([r,c]);
+    if(empty.length===0) return;
+    const [r,c]=empty[Math.floor(Math.random()*empty.length)];
+    grid[r][c]=Math.random()>0.1?2:4;
+  }
+  function slide(row){
+    let arr=row.filter(v=>v!==0);
+    for(let i=0;i<arr.length-1;i++){if(arr[i]===arr[i+1]){arr[i]*=2;updateScore(score+arr[i]);arr.splice(i+1,1);}}
+    while(arr.length<size) arr.push(0);
+    return arr;
+  }
+  function move(dir){
+    let moved=false;const old=JSON.stringify(grid);
+    if(dir==='left') for(let r=0;r<size;r++) grid[r]=slide(grid[r]);
+    else if(dir==='right') for(let r=0;r<size;r++) grid[r]=slide(grid[r].reverse()).reverse();
+    else if(dir==='up'){for(let c=0;c<size;c++){let col=[];for(let r=0;r<size;r++) col.push(grid[r][c]);col=slide(col);for(let r=0;r<size;r++) grid[r][c]=col[r];}}
+    else if(dir==='down'){for(let c=0;c<size;c++){let col=[];for(let r=0;r<size;r++) col.push(grid[r][c]);col=slide(col.reverse()).reverse();for(let r=0;r<size;r++) grid[r][c]=col[r];}}
+    if(JSON.stringify(grid)!==old){addRandom();draw();checkGameOver();}
+  }
+  function checkGameOver(){
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++){if(grid[r][c]===0)return;if(c<size-1&&grid[r][c]===grid[r][c+1])return;if(r<size-1&&grid[r][c]===grid[r+1][c])return;}
+    gameOver=true;document.removeEventListener('keydown',kh);showGameOver(score);
+  }
+  function tileColor(v){
+    const colors={0:'#1a1a2e',2:'#6366f1',4:'#818cf8',8:'#a855f7',16:'#c084fc',32:'#22d3ee',64:'#06b6d4',128:'#34d399',256:'#10b981',512:'#f59e0b',1024:'#f43f5e',2048:'#ec4899'};
+    return colors[v]||'#f43f5e';
+  }
+  function draw(){
+    ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,W,H);
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++){
+      const x=pad+c*(cellW+pad),y=pad+r*(cellH+pad),v=grid[r][c];
+      ctx.fillStyle=tileColor(v);ctx.shadowColor=tileColor(v);ctx.shadowBlur=v?10:0;
+      ctx.beginPath();ctx.roundRect(x,y,cellW,cellH,12);ctx.fill();
+      ctx.shadowBlur=0;
+      if(v){ctx.fillStyle='#fff';ctx.font=`bold ${v>=1024?'2em':'2.5em'} Orbitron,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(v,x+cellW/2,y+cellH/2);}
+    }
+  }
+  addRandom();addRandom();draw();
+  const kh=e=>{
+    if(gameOver)return;
+    if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A') move('left');
+    else if(e.key==='ArrowRight'||e.key==='d'||e.key==='D') move('right');
+    else if(e.key==='ArrowUp'||e.key==='w'||e.key==='W') move('up');
+    else if(e.key==='ArrowDown'||e.key==='s'||e.key==='S') move('down');
+    e.preventDefault();
+  };
+  document.addEventListener('keydown',kh);
+  const origClose=closeGame;
+  closeGame=()=>{document.removeEventListener('keydown',kh);closeGame=origClose;origClose();};
+}
+
+// ========================== INIT ==========================
+renderGames(GAMES);
+</script>
+</body>
+</html>
